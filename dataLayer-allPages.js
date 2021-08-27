@@ -347,134 +347,134 @@ __DL__jQueryinterval = setInterval(function(){
                     }
                 },
                 {% endfor %}]
-            };
-            var collections = {
-                'productList' : {{collection.title | json}},
-                'pageType'    : 'Collection',
-                'event'       : 'Collection'
-            };
-            dataLayer.push(product);
-            dataLayer.push(collections);
-            if(__DL__.debug){
-                console.log("Collections"+" :"+JSON.stringify(product, null, " "));
-                console.log("Collections"+" :"+JSON.stringify(collections, null, " "));
-            }
-            {% endif %}
+        };
+        var collections = {
+            'productList' : {{collection.title | json}},
+            'pageType'    : 'Collection',
+            'event'       : 'Collection'
+        };
+        dataLayer.push(product);
+        dataLayer.push(collections);
+        if(__DL__.debug){
+            console.log("Collections"+" :"+JSON.stringify(product, null, " "));
+            console.log("Collections"+" :"+JSON.stringify(collections, null, " "));
+        }
+        {% endif %}
             
-            /** DATALAYER: Product Page
-            * Fire on all Product View pages. */
+        /** DATALAYER: Product Page
+        * Fire on all Product View pages. */
+        
+        if (template.match(/.*product.*/gi) && !template.match(/.*collection.*/gi)) {
             
-            if (template.match(/.*product.*/gi) && !template.match(/.*collection.*/gi)) {
-                
-                sku = '';
-                var product = {
-                    'products': [{
-                        'id'              : {{product.id | json}},
-                        'sku'             : {{product.selected_variant.sku | json}},
-                        'variantId'       : {{product.selected_variant.id | json}},
-                        'productType'     : {{product.type | json}},
-                        'name'            : {{product.title | json}},
-                        'price'           : {{product.price | money_without_currency | remove: "," | json}},
-                        'description'     : {{product.description | strip_newlines | strip_html | json}},
-                        'imageURL'        : "https:{{product.featured_image.src|img_url:'grande'}}", 
-                        'productURL'      : '{{shop.secure_url}}{{product.url}}',
-                        'brand'           : {{shop.name | json}},              
-                        'comparePrice'    : {{product.compare_at_price_max | money_without_currency | remove: "," | json}},
-                        'categories'      : {{product.collections | map:"title" | json}},
-                        'currentCategory' : {{collection.title | json}},
-                        'productOptions'  : {
-                            {% for option in product.options_with_values %}
-                            {% for value in option.values %}
-                            {% if option.selected_value == value %}
-                            {{option.name | json}} : {{value | json}},
-                            {% endif %}
-                            {% endfor %}
-                            {% endfor %}
-                        }
-                    }]
-                };
-                
-                function productView(){
-                    var sku = {{product.selected_variant.sku | json}};
-                    dataLayer.push(product, {
-                        'pageType' : 'Product',
-                        'event'    : 'Product'});
-                        if(__DL__.debug){
-                            console.log("Product"+" :"+JSON.stringify(product, null, " "));
-                        }
+            sku = '';
+            var product = {
+                'products': [{
+                    'id'              : {{product.id | json}},
+                    'sku'             : {{product.selected_variant.sku | json}},
+                    'variantId'       : {{product.selected_variant.id | json}},
+                    'productType'     : {{product.type | json}},
+                    'name'            : {{product.title | json}},
+                    'price'           : {{product.price | money_without_currency | remove: "," | json}},
+                    'description'     : {{product.description | strip_newlines | strip_html | json}},
+                    'imageURL'        : "https:{{product.featured_image.src|img_url:'grande'}}", 
+                    'productURL'      : '{{shop.secure_url}}{{product.url}}',
+                    'brand'           : {{shop.name | json}},              
+                    'comparePrice'    : {{product.compare_at_price_max | money_without_currency | remove: "," | json}},
+                    'categories'      : {{product.collections | map:"title" | json}},
+                    'currentCategory' : {{collection.title | json}},
+                    'productOptions'  : {
+                        {% for option in product.options_with_values %}
+                        {% for value in option.values %}
+                        {% if option.selected_value == value %}
+                        {{option.name | json}} : {{value | json}},
+                        {% endif %}
+                        {% endfor %}
+                        {% endfor %}
                     }
-                    productView();
-                    
-                    $(__DL__.cartTriggers).click(function(){
-                        var skumatch = {{product.selected_variant.sku | json}};
-                        if(sku != skumatch){
-                            productView();
-                        }
-                    });
-                }
-                
-                /** DATALAYER: Cart View
-                * Fire anytime a user views their cart (non-dynamic) */
-                
-                {% if template contains 'cart' %}
-                var cart = {
-                    'products':[{% for line_item in cart.items %}{
-                        'id'       : {{line_item.product_id | json}},
-                        'sku'      : {{line_item.sku | json}},
-                        'variant'  : {{line_item.variant_id | json}},
-                        'name'     : {{line_item.title | json}},
-                        'price'    : {{line_item.price | money_without_currency | remove: "," | json}},
-                        'quantity' : {{line_item.quantity | json}}
-                    },{% endfor %}],
-                    'pageType' : 'Cart',
-                    'event'    : 'Cart'
-                };
-                
-                dataLayer.push(cart);
+                }]
+            };
+            
+            function productView(){
+                var sku = {{product.selected_variant.sku | json}};
+                dataLayer.push(product, {
+                    'pageType' : 'Product',
+                    'event'    : 'Product'});
                 if(__DL__.debug){
-                    console.log("Cart"+" :"+JSON.stringify(cart, null, " "));
+                    console.log("Product"+" :"+JSON.stringify(product, null, " "));
                 }
+            }
+            productView();
                 
-                __DL__.cart = cart.products;
-                $(__DL__.removeCartTrigger).on('click', function (event) {
-                    
-                    setTimeout(function(){
-                        // remove from cart
-                        jQuery.getJSON("/cart", function (response) {
-                            // get Json response 
-                            __DL__.removeCart = response;
-                            var removeFromCart = {
-                                'products': __DL__.removeCart.items.map(function (line_item) {
-                                    return {
-                                        'id'       : line_item.product_id,
-                                        'sku'      : line_item.sku,
-                                        'variant'  : line_item.variant_id,
-                                        'name'     : line_item.title,
-                                        'price'    : (line_item.price/100),
-                                        'quantity' : line_item.quantity
-                                    }
-                                }),
-                                'pageType' : 'Remove from Cart',
-                                'event'    : 'Remove from Cart'         
-                            };
-                            __DL__.removeCart = removeFromCart;
-                            var cartIDs = [];
-                            var removeIDs = [];
-                            var removeCart = [];
-                            
-                            // remove from cart logic
-                            for(var i=__DL__.cart.length-1;i>=0;i--){var x=parseFloat(__DL__.cart[i].variant);cartIDs.push(x)}for(var i=__DL__.removeCart.products.length-1;i>=0;i--){var x=parseFloat(__DL__.removeCart.products[i].variant);removeIDs.push(x)}function arr_diff(b,c){var a=[],diff=[];for(var i=0;i<b.length;i++){a[b[i]]=true}for(var i=0;i<c.length;i++){if(a[c[i]]){delete a[c[i]]}else{a[c[i]]=true}}for(var k in a){diff.push(k)}return diff};var x=arr_diff(cartIDs,removeIDs)[0];for(var i=__DL__.cart.length-1;i>=0;i--){if(__DL__.cart[i].variant==x){removeCart.push(__DL__.cart[i])}}
-                            
-                            dataLayer.push(removeCart);
-                            if (__DL__.debug) {
-                                console.log("Cart"+" :"+JSON.stringify(removeCart, null, " "));
+            $(__DL__.cartTriggers).click(function(){
+                var skumatch = {{product.selected_variant.sku | json}};
+                if(sku != skumatch){
+                    productView();
+                }
+            });
+        }
+                
+        /** DATALAYER: Cart View
+        * Fire anytime a user views their cart (non-dynamic) */
+        
+        {% if template contains 'cart' %}
+        var cart = {
+            'products':[{% for line_item in cart.items %}{
+                'id'       : {{line_item.product_id | json}},
+                'sku'      : {{line_item.sku | json}},
+                'variant'  : {{line_item.variant_id | json}},
+                'name'     : {{line_item.title | json}},
+                'price'    : {{line_item.price | money_without_currency | remove: "," | json}},
+                'quantity' : {{line_item.quantity | json}}
+            },{% endfor %}],
+            'pageType' : 'Cart',
+            'event'    : 'Cart'
+        };
+        
+        dataLayer.push(cart);
+        if(__DL__.debug){
+            console.log("Cart"+" :"+JSON.stringify(cart, null, " "));
+        }
+        
+        __DL__.cart = cart.products;
+        $(__DL__.removeCartTrigger).on('click', function (event) {
+            
+            setTimeout(function(){
+                // remove from cart
+                jQuery.getJSON("/cart", function (response) {
+                    // get Json response 
+                    __DL__.removeCart = response;
+                    var removeFromCart = {
+                        'products': __DL__.removeCart.items.map(function (line_item) {
+                            return {
+                                'id'       : line_item.product_id,
+                                'sku'      : line_item.sku,
+                                'variant'  : line_item.variant_id,
+                                'name'     : line_item.title,
+                                'price'    : (line_item.price/100),
+                                'quantity' : line_item.quantity
                             }
-                        });
-                    }, 2000);
+                        }),
+                        'pageType' : 'Remove from Cart',
+                        'event'    : 'Remove from Cart'         
+                    };
+                    __DL__.removeCart = removeFromCart;
+                    var cartIDs = [];
+                    var removeIDs = [];
+                    var removeCart = [];
                     
+                    // remove from cart logic
+                    for(var i=__DL__.cart.length-1;i>=0;i--){var x=parseFloat(__DL__.cart[i].variant);cartIDs.push(x)}for(var i=__DL__.removeCart.products.length-1;i>=0;i--){var x=parseFloat(__DL__.removeCart.products[i].variant);removeIDs.push(x)}function arr_diff(b,c){var a=[],diff=[];for(var i=0;i<b.length;i++){a[b[i]]=true}for(var i=0;i<c.length;i++){if(a[c[i]]){delete a[c[i]]}else{a[c[i]]=true}}for(var k in a){diff.push(k)}return diff};var x=arr_diff(cartIDs,removeIDs)[0];for(var i=__DL__.cart.length-1;i>=0;i--){if(__DL__.cart[i].variant==x){removeCart.push(__DL__.cart[i])}}
+                    
+                    dataLayer.push(removeCart);
+                    if (__DL__.debug) {
+                        console.log("Cart"+" :"+JSON.stringify(removeCart, null, " "));
+                    }
                 });
+            }, 2000);
+            
+        });
                 
-                {% endif %}
+        {% endif %}
                 
                 /** 
                 * DATALAYER Variable
