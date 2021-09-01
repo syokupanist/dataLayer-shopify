@@ -326,6 +326,29 @@ __DL__jQueryinterval = setInterval(function(){
                 console.log("search"+" :"+JSON.stringify(search, null, " "));
             }
         }
+
+        /** DATALAYER: select_item
+         * すべてのページのaタグにイベントハンドラを登録。
+         * どの商品ページへのリンクをクリックしたかで、選択された商品を判定
+         * 
+        */
+        $("a").on("click", function(event) {
+            var target = event.currentTarget
+            if(!target.attributes || !target.attributes.href) return;
+            var link = decodeURIComponent(target.attributes.href.value);
+            console.log(link);
+            if (!link.startsWith('/products/')) return;
+            var matched = /\/products\/(.*)\?.*/.exec(link);
+            if (!matched[1]) return;
+            var select_item = {
+                "event": 'select_item',
+                "item_name": matched[1]
+            }
+            dataLayer.push(select_item);
+            if(__DL__.debug){
+                console.log("select_item"+" :"+JSON.stringify(select_item, null, " "));
+            }
+        })
                 
         /** DATALAYER: Cart View
         * Fire anytime a user views their cart (non-dynamic) */
