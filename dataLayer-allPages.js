@@ -311,6 +311,21 @@ __DL__jQueryinterval = setInterval(function(){
             }
             productView();
         }
+
+        /** DATALAYER: Search Results */
+        var searchPage = new RegExp(__DL__.searchPage, "g");
+        if(document.location.pathname.match(searchPage)){
+            var search = {
+                'search_term' : {{search.terms | json}},
+                'pageType'   : "Search",
+                'event'      : "search"
+            };
+            
+            dataLayer.push(search);
+            if(__DL__.debug){
+                console.log("search"+" :"+JSON.stringify(search, null, " "));
+            }
+        }
                 
         /** DATALAYER: Cart View
         * Fire anytime a user views their cart (non-dynamic) */
@@ -483,22 +498,6 @@ __DL__jQueryinterval = setInterval(function(){
                     * Fire all pages trigger after all additional dataLayers have loaded. */
                     
                     $(document).ready(function() {
-                        
-                        /** DATALAYER: Search Results */
-                        
-                        var searchPage = new RegExp(__DL__.searchPage, "g");
-                        if(document.location.pathname.match(searchPage)){
-                            var search = {
-                                'searchTerm' : __DL__.searchTermQuery,
-                                'pageType'   : "Search",
-                                'event'      : "Search"
-                            };
-                            
-                            dataLayer.push(search);
-                            if(__DL__.debug){
-                                console.log("Search"+" :"+JSON.stringify(search, null, " "));
-                            }
-                        }
                         
                         /** DATALAYER: Cart */
                         
