@@ -50,7 +50,6 @@ __DL__jQueryinterval = setInterval(function(){
             dynamicCart: true,  // if cart is dynamic (meaning no refresh on cart add) set to true
             debug: true, // if true, console messages will be displayed
             cart: null,
-            wishlist: null,
             removeCart: null
         };
         
@@ -59,15 +58,7 @@ __DL__jQueryinterval = setInterval(function(){
             viewCart: [],
             removeCartTrigger: [],
             cartVisableSelector: [],
-            promoSubscriptionsSelectors: [],
-            promoSuccess: [],
-            ctaSelectors: [],
-            newsletterSelectors: [],
-            newsletterSuccess: [],
             searchPage: [],
-            wishlistSelector: [],
-            removeWishlist: [],
-            wishlistPage: [],
             searchTermQuery: [getURLParams('q')], // replace var with correct query
         };
         
@@ -77,15 +68,7 @@ __DL__jQueryinterval = setInterval(function(){
             viewCart: ['form[action="/cart"],.my-cart,.trigger-cart,#mobileCart'],
             removeCartTrigger: ['[href*="/cart/change"]'],
             cartVisableSelector: ['.inlinecart.is-active,.inline-cart.is-active'],
-            promoSubscriptionsSelectors: [],
-            promoSuccess: [],
-            ctaSelectors: [],
-            newsletterSelectors: ['input.contact_email'],
-            newsletterSuccess: ['.success_message'],
             searchPage: ['search'],
-            wishlistSelector: [],
-            removeWishlist: [],
-            wishlistPage: []
         };
         
         // stitch bindings
@@ -740,116 +723,9 @@ __DL__jQueryinterval = setInterval(function(){
             $(document).on('click', __DL__.cartTriggers, function() {
                 __DL__addtocart();
             });
-            
-            /** 
-             * DATALAYER: Newsletter Subscription */
-            __DL__newsletter_fire = 0;
-            $(document).on('click', __DL__.newsletterSelectors, function () {
-                if(__DL__newsletter_fire !== 1){
-                    __DL__newsletter_fire = 1;
-                    var newsletterCheck = setInterval(function () {
-                        // begin check interval
-                        if ($(__DL__.newsletterSuccess).length > 0) {
-                            // check visible selectors
-                            clearInterval(newsletterCheck);
-                            dataLayer.push({'event': 'Newsletter Subscription'});
-                        }
-                    },500);
-                }
-            });
-            
-            /** DATALAYER: Wishlist */
-            setTimeout( function(){
                 
-                $(__DL__.wishlistSelector).on('click', function () {
-                    dataLayer.push(product,
-                        {'event': 'Add to Wishlist'});
-                        if(__DL__.debug){
-                            console.log("Wishlist"+" :"+JSON.stringify(product, null, " "));
-                        }
-                    });
-                    
-                    if(document.location.pathname == __DL__.wishlistPage){
-                        var __DL__productLinks = $('[href*="product"]');
-                        var __DL__prods        = [];
-                        var __DL__links        = [];
-                        var __DL__count        = 1;
-                        
-                        $(__DL__productLinks).each(function(){
-                            var href = $(this).attr("href");
-                            if(!__DL__links.includes(href)){
-                                __DL__links.push(href);
-                                $(this).attr("dataLayer-wishlist-item",__DL__count++);
-                                jQuery.getJSON(href, function (response) {
-                                    // get Json response 
-                                    __DL__.wishlist = response;
-                                    var wishlistproducts = {
-                                        'id'   : __DL__.wishlist.product.id,
-                                        'name' : __DL__.wishlist.product.title,
-                                    };
-                                    __DL__prods.push(wishlistproducts);
-                                });
-                            }
-                        });
-                        
-                        dataLayer.push({'products': __DL__prods, 
-                        'pageType' : 'Wishlist',
-                        'event'    : 'Wishlist'});
-                    }
-                    
-                    var __DL__count = 1;
-                    var wishlistDel  = $(__DL__.removeWishlist);
-                    wishlistDel.each(function(){
-                        $(this).attr("dataLayer-wishlist-item-del",__DL__count++);
-                    });
-                    
-                    $(__DL__.removeWishlist).on('click', function(){
-                        console.log('click')
-                        var index = $(this).attr("dataLayer-wishlist-item-del");
-                        var link  = $("[dataLayer-wishlist-item="+index+"]").attr("href");
-                        console.log(index)
-                        console.log(link)
-                        jQuery.getJSON(link, function (response) {
-                            // get Json response 
-                            __DL__.wishlist     = response;
-                            var wishlistproducts = {
-                                'id'   : __DL__.wishlist.product.id,
-                                'name' : __DL__.wishlist.product.title,
-                            };
-                            
-                            dataLayer.push({'products': wishlistproducts,
-                            'pageType' : 'Wishlist',
-                            'event'    : 'Wishlist Delete Product'});
-                        });
-                    })
-                }, 3000);
-                
-                /** DATALAYER: CTAs */
-                $(__DL__.ctaSelectors).on('click', function () {
-                    var ctaCheck = setInterval(function () {
-                        // begin check interval
-                        if ($(__DL__.ctaSuccess).length > 0) {
-                            // check visible selectors
-                            clearInterval(ctaCheck);
-                            dataLayer.push({'event': 'CTA'});
-                        }
-                    },500);
-                });
-                
-                /** DATALAYER: Promo Subscriptions */
-                $(__DL__.promoSubscriptionsSelectors).on('click', function () {
-                    var ctaCheck = setInterval(function () {
-                        // begin check interval
-                        if ($(__DL__.promoSuccess).length > 0) {
-                            // check visible selectors
-                            clearInterval(ctaCheck);
-                            dataLayer.push({'event': 'Promo Subscription'});
-                        }
-                    },500);
-                });
-                
-            }); // document ready
-        }
+        }); // document ready
+    }
 }, 500);
 </script>
                         
