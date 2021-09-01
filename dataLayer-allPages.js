@@ -321,44 +321,48 @@ __DL__jQueryinterval = setInterval(function(){
         * Fire on all product listing pages. */
         
         {% if template contains 'collection' %}
-        var product = {
-            'products': [
-                {% for product in collection.products %}{
-                    'id'              : {{product.id | json}},
-                    'sku'             : {{product.selected_variant.sku | json}},
-                    'variantId'       : {{product.selected_variant.id | json}},
-                    'productType'     : {{product.type | json}},
-                    'name'            : {{product.title | json}},
-                    'price'           : {{product.price | money_without_currency | remove: "," | json}},
-                    'imageURL'        : "https:{{product.featured_image.src|img_url:'grande'}}", 
-                    'productURL'      : '{{shop.secure_url}}{{product.url}}',
-                    'brand'           : {{shop.name | json}},
-                    'comparePrice'    : {{product.compare_at_price_max | money_without_currency | remove: "," | json}},
-                    'categories'      : {{product.collections|map:"title" | json}},
-                    'currentCategory' : {{collection.title | json}},
-                    'productOptions'  : {
-                        {% for option in product.options_with_values %}
-                        {% for value in option.values %}
-                        {% if option.selected_value == value %}
-                        {{option.name | json}} : {{value | json}},
-                        {% endif %}
+            var product = {
+                'ecommerce': {
+                    'items': [
+                        {% for product in collection.products %}
+                        {
+                            'item_name'            : {{product.title | json}},
+                            'item_id'              : {{product.id | json}},
+                            'variant_id'       : {{product.selected_variant.id | json}},
+                            'sku'             : {{product.selected_variant.sku | json}},
+                            'price'           : {{product.price | money_without_currency | remove: "," | json}},
+                            'item_brand'           : {{shop.name | json}},              
+                            'item_type'     : {{product.type | json}},
+                            'item_category' : {{product.collections[0].title | json}},
+                            'item_category2' : {{product.collections[1].title | json}},
+                            'item_category3' : {{product.collections[2].title | json}},
+                            'item_category4' : {{product.collections[3].title | json}},
+                            'item_category5' : {{product.collections[4].title | json}},
+                            'item_options'  : {
+                                {% for option in product.options_with_values %}
+                                {% for value in option.values %}
+                                {% if option.selected_value == value %}
+                                {{option.name | json}} : {{value | json}},
+                                {% endif %}
+                                {% endfor %}
+                                {% endfor %}
+                            }
+                        },
                         {% endfor %}
-                        {% endfor %}
-                    }
-                },
-                {% endfor %}]
-        };
-        var collections = {
-            'productList' : {{collection.title | json}},
-            'pageType'    : 'Collection',
-            'event'       : 'Collection'
-        };
-        dataLayer.push(product);
-        dataLayer.push(collections);
-        if(__DL__.debug){
-            console.log("Collections"+" :"+JSON.stringify(product, null, " "));
-            console.log("Collections"+" :"+JSON.stringify(collections, null, " "));
-        }
+                    ]
+                }
+            };
+            var collections = {
+                'event'       : 'view_item_list',
+                'item_list_name' : {{collection.title | json}},
+                'pageType'    : 'Collection',
+            };
+            dataLayer.push(product);
+            dataLayer.push(collections);
+            if(__DL__.debug){
+                console.log("view_item_list"+" :"+JSON.stringify(product, null, " "));
+                console.log("view_item_list"+" :"+JSON.stringify(collections, null, " "));
+            }
         {% endif %}
             
         /** DATALAYER: Product Page
