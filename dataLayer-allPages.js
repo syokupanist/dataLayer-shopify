@@ -333,29 +333,52 @@ __DL__jQueryinterval = setInterval(function(){
             }
         })
                 
-        /** DATALAYER: Cart View
+        /** DATALAYER: view_cart
         * Fire anytime a user views their cart (non-dynamic) */
         
         {% if template contains 'cart' %}
             var cart = {
-                'products':[{% for line_item in cart.items %}{
-                    'id'       : {{line_item.product_id | json}},
-                    'sku'      : {{line_item.sku | json}},
-                    'variant'  : {{line_item.variant_id | json}},
-                    'name'     : {{line_item.title | json}},
-                    'price'    : {{line_item.price | money_without_currency | remove: "," | json}},
-                    'quantity' : {{line_item.quantity | json}}
-                },{% endfor %}],
+                'event'    : 'view_cart',
+                'currency'      : {{cart.currency | json}},
+                'value'      : {{cart.total_price | money_without_currency | remove: "," | json}},
                 'pageType' : 'Cart',
-                'event'    : 'Cart'
+                'ecommerce': {
+                    'items':[
+                    {% for line_item in cart.items %}
+                        {
+                            'item_name'            : {{line_item.product.title | json}},
+                            'item_id'              : {{line_item.product.id | json}},
+                            'variant_id'       : {{line_item.product.selected_variant.id | json}},
+                            'sku'             : {{line_item.product.selected_variant.sku | json}},
+                            'price'           : {{line_item.product.price | money_without_currency | remove: "," | json}},
+                            'item_brand'           : {{shop.name | json}},              
+                            'item_type'     : {{line_item.product.type | json}},
+                            'item_category' : {{line_item.product.collections[0].title | json}},
+                            'item_category2' : {{line_item.product.collections[1].title | json}},
+                            'item_category3' : {{line_item.product.collections[2].title | json}},
+                            'item_category4' : {{line_item.product.collections[3].title | json}},
+                            'item_category5' : {{line_item.product.collections[4].title | json}},
+                            'item_options'  : {
+                                {% for option in line_item.product.options_with_values %}
+                                {% for value in option.values %}
+                                {% if option.selected_value == value %}
+                                {{option.name | json}} : {{value | json}},
+                                {% endif %}
+                                {% endfor %}
+                                {% endfor %}
+                            }
+                        },
+                    {% endfor %}],
+                    // TODO: add quantity
+                }
             };
         
             dataLayer.push(cart);
             if(__DL__.debug){
-                console.log("Cart"+" :"+JSON.stringify(cart, null, " "));
+                console.log("view_cart"+" :"+JSON.stringify(cart, null, " "));
             }
         
-            __DL__.cart = cart.products;
+            __DL__.cart = cart.ecommerce.items;
             $(__DL__.removeCartTrigger).on('click', function (event) {
                 setTimeout(function(){
                     // remove from cart
