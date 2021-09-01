@@ -210,79 +210,32 @@ __DL__jQueryinterval = setInterval(function(){
         }
         
         /** 
-        * DATALAYER: Log State
+        * DATALAYER: basic_dl_info
         * 1. Determine if user is logged in or not.
         * 2. Return User specific data. */
         
-        var logState = {
+        var basic_dl_info = {
             {% if shop.customer_accounts_enabled %}
-            {% if customer %}
-            'userId'        : {{customer.id | json}},
-            'customerEmail' : {{customer.email | json}},
-            'logState'      : "Logged In",
-            'customerInfo'  : {
-                'firstName'   : {{customer_address.first_name | json}},
-                'lastName'    : {{customer_address.last_name | json}},
-                'address1'    : {{customer_address.address1 | json}},
-                'address2'    : {{customer_address.address2 | json}},
-                'street'      : {{customer_address.street | json}},
-                'city'        : {{customer_address.city | json}},
-                'province'    : {{customer_address.province | json}},
-                'zip'         : {{customer_address.zip | json}},
-                'country'     : {{customer_address.country | json}},
-                'phone'       : {{customer_address.phone | json}},
-                'totalOrders' : {{customer.orders_count | json}},
-                'totalSpent'  : {{customer.total_spent | money_without_currency | remove: "," | json}}
-            },
-            {% else %}
-            'logState' : "Logged Out",
+                {% if customer %}
+                    'user_id'        : {{customer.id | json}},
+                    'user_type'      : "Member",
+                {% else %}
+                    'user_type' : "Guest",
+                {% endif %}
             {% endif %}
-            {% endif %}
-            'firstLog'      : firstLog,
-            'customerEmail' : {{customer.email | json}},
-            'timestamp'     : Date.now(),  
             {% if customer.orders_count > 2 %}
-            'customerType'       : 'Returning',
-            'customerTypeNumber' : '0',
+                'customerType'       : 'Returning',
             {% else %}
-            'customerType'       : 'New',
-            'customerTypeNumber' :'1', 
+                'customerType'       : 'New',
             {% endif %}
-            'shippingInfo' : {
-                'fullName'  : {{checkout.shipping_address.name | json}},
-                'firstName' : {{checkout.shipping_address.first_name | json}},
-                'lastName'  : {{checkout.shipping_address.last_name | json}},
-                'address1'  : {{checkout.shipping_address.address1 | json}},
-                'address2'  : {{checkout.shipping_address.address2 | json}},
-                'street'    : {{checkout.shipping_address.street | json}},
-                'city'      : {{checkout.shipping_address.city | json}},
-                'province'  : {{checkout.shipping_address.province | json}},
-                'zip'       : {{checkout.shipping_address.zip | json}},
-                'country'   : {{checkout.shipping_address.country | json}},
-                'phone'     : {{checkout.shipping_address.phone | json}},
-            },
-            'billingInfo' : {
-                'fullName'  : {{checkout.billing_address.name | json}},
-                'firstName' : {{checkout.billing_address.first_name | json}},
-                'lastName'  : {{checkout.billing_address.last_name | json}},
-                'address1'  : {{checkout.billing_address.address1 | json}},
-                'address2'  : {{checkout.billing_address.address2 | json}},
-                'street'    : {{checkout.billing_address.street | json}},
-                'city'      : {{checkout.billing_address.city | json}},
-                'province'  : {{checkout.billing_address.province | json}},
-                'zip'       : {{checkout.billing_address.zip | json}},
-                'country'   : {{checkout.billing_address.country | json}},
-                'phone'     : {{checkout.billing_address.phone | json}},
-            },
-            'checkoutEmail' : {{checkout.email | json}},
             'currency'      : {{shop.currency | json}},
-            'pageType'      : 'Log State',
-            'event'         : 'Log State'
+            'pageType'      : {{template | json}},
+            'event'         : 'basic_dl_info'
         }
         
-        dataLayer.push(logState);
+        dataLayer.push(basic_dl_info);
         if(__DL__.debug){
-            console.log("Log State"+" :"+JSON.stringify(logState, null, " "));
+            console.log("basic_dl_info"+" :"+JSON.stringify(basic_dl_info, null, " "));
         }
         
         /** 
