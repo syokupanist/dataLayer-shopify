@@ -607,77 +607,73 @@ __DL__jQueryinterval = setInterval(function(){
             
             function __DL__addtocart(){
 
-            {% if template contains 'collection' %}         
-                
-                setTimeout(function(){
-                    jQuery.getJSON('/cart.js', function (response) {
-                        // get Json response 
-                        __DL__.cart = response;
-                        var cart = {
-                            'products': __DL__.cart.items.map(function (line_item) {
-                                return {
-                                    'id'       : line_item.id,
-                                    'sku'      : line_item.sku,
-                                    'variant'  : line_item.variant_id,
-                                    'name'     : line_item.title,
-                                    'price'    : (line_item.price/100),
-                                    'quantity' : line_item.quantity
+                {% if template contains 'collection' %}         
+                    setTimeout(function(){
+                        jQuery.getJSON('/cart.js', function (response) {
+                            // get Json response 
+                            __DL__.cart = response;
+                            var cart = {
+                                'products': __DL__.cart.items.map(function (line_item) {
+                                    return {
+                                        'id'       : line_item.id,
+                                        'sku'      : line_item.sku,
+                                        'variant'  : line_item.variant_id,
+                                        'name'     : line_item.title,
+                                        'price'    : (line_item.price/100),
+                                        'quantity' : line_item.quantity
+                                    }
+                                })
+                            }
+                            __DL__.cart = cart;
+                            for (var i = __DL__.cart.products.length - 1; i >= 0; i--) {
+                                var x = parseFloat(__DL__.cart.products[i].variant);
+                                collection_matchIDs.push(x);
+                            }
+                            function arr_diff(b, c) {
+                                var a = [],
+                                diff = [];
+                                for (var i = 0; i < b.length; i++) {
+                                    a[b[i]] = true
                                 }
-                            })
-                        }
-                        __DL__.cart = cart;
-                        for (var i = __DL__.cart.products.length - 1; i >= 0; i--) {
-                            var x = parseFloat(__DL__.cart.products[i].variant);
-                            collection_matchIDs.push(x);
-                        }
-                        function arr_diff(b, c) {
-                            var a = [],
-                            diff = [];
-                            for (var i = 0; i < b.length; i++) {
-                                a[b[i]] = true
-                            }
-                            for (var i = 0; i < c.length; i++) {
-                                if (a[c[i]]) {
-                                    delete a[c[i]]
-                                } else {
-                                    a[c[i]] = true
+                                for (var i = 0; i < c.length; i++) {
+                                    if (a[c[i]]) {
+                                        delete a[c[i]]
+                                    } else {
+                                        a[c[i]] = true
+                                    }
+                                }
+                                for (var k in a) {
+                                    diff.push(k)
+                                }
+                                return diff
+                            };
+                            var x = arr_diff(collection_cartIDs, collection_matchIDs).pop();
+                            console.log(x);
+                            for (var i = __DL__.cart.products.length - 1; i >= 0; i--) {
+                                if (__DL__.cart.products[i].variant.toString() === x) {
+                                    product = {'products':[__DL__.cart.products[i]]};
+                                    dataLayer.push({'products':product});
+                                    dataLayer.push(product);
+                                    dataLayer.push({
+                                        'pageType' : 'Add to Cart',
+                                        'event'    : 'Add to Cart'
+                                    });
+                                    if (__DL__.debug) {
+                                        console.log("Add to Cart"+" :"+JSON.stringify(product, null, " "));
+                                    }
                                 }
                             }
-                            for (var k in a) {
-                                diff.push(k)
-                            }
-                            return diff
-                        };
-                        var x = arr_diff(collection_cartIDs, collection_matchIDs).pop();
-                        console.log(x);
-                        for (var i = __DL__.cart.products.length - 1; i >= 0; i--) {
-                            if (__DL__.cart.products[i].variant.toString() === x) {
-                                product = {'products':[__DL__.cart.products[i]]};
-                                dataLayer.push({'products':product});
-                                dataLayer.push(product);
-                                dataLayer.push({
-                                    'pageType' : 'Add to Cart',
-                                    'event'    : 'Add to Cart'
-                                });
-                                if (__DL__.debug) {
-                                    console.log("Add to Cart"+" :"+JSON.stringify(product, null, " "));
-                                }
-                            }
-                        }
-                    });
-                },1000);
-                
+                        });
+                    },1000);
                 {% else %}
+                    dataLayer.push(product, {
+                        'pageType' : 'Add to Cart',
+                        'event'    : 'Add to Cart'
+                    });
                 
-                dataLayer.push(product, {
-                    'pageType' : 'Add to Cart',
-                    'event'    : 'Add to Cart'
-                });
-                
-                if (__DL__.debug) {
-                    console.log("Add to Cart"+" :"+JSON.stringify(product, null, " "));
-                }
-                
+                    if (__DL__.debug) {
+                        console.log("Add to Cart"+" :"+JSON.stringify(product, null, " "));
+                    }
                 {% endif %}
                 
                 // if dynamic cart is TRUE
