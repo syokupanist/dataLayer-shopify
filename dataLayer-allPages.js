@@ -366,7 +366,7 @@ __DL__jQueryinterval = setInterval(function(){
         
         if (template.match(/.*product.*/gi) && !template.match(/.*collection.*/gi)) {
             
-            sku = '';
+            // sku = '';
             var product = {
                 'ecommerce': {
                     'currency'      : {{shop.currency | json}},
@@ -379,12 +379,11 @@ __DL__jQueryinterval = setInterval(function(){
                         'price'           : {{product.price | money_without_currency | remove: "," | json}},
                         'item_brand'           : {{shop.name | json}},              
                         'item_type'     : {{product.type | json}},
-                        // 'description'     : {{product.description | strip_newlines | strip_html | json}},
-                        // 'imageURL'        : "https:{{product.featured_image.src|img_url:'grande'}}", 
-                        // 'productURL'      : '{{shop.secure_url}}{{product.url}}',
-                        // 'comparePrice'    : {{product.compare_at_price_max | money_without_currency | remove: "," | json}},
-                        // 'categories'      : {{product.collections | map:"title" | json}},
-                        // 'currentCategory' : {{collection.title | json}},
+                        'item_category' : {{product.collections[0].title | json}},
+                        'item_category2' : {{product.collections[1].title | json}},
+                        'item_category3' : {{product.collections[2].title | json}},
+                        'item_category4' : {{product.collections[3].title | json}},
+                        'item_category5' : {{product.collections[4].title | json}},
                         'item_options'  : {
                             {% for option in product.options_with_values %}
                             {% for value in option.values %}
@@ -399,7 +398,7 @@ __DL__jQueryinterval = setInterval(function(){
             };
             
             function productView(){
-                var sku = {{product.selected_variant.sku | json}};
+                // var sku = {{product.selected_variant.sku | json}};
                 dataLayer.push(product, {
                     'pageType' : 'Product',
                     'event'    : 'view_item'});
@@ -409,12 +408,12 @@ __DL__jQueryinterval = setInterval(function(){
             }
             productView();
                 
-            $(__DL__.cartTriggers).click(function(){
-                var skumatch = {{product.selected_variant.sku | json}};
-                if(sku != skumatch){
-                    productView();
-                }
-            });
+            // $(__DL__.cartTriggers).click(function(){
+            //     var skumatch = {{product.selected_variant.sku | json}};
+            //     if(sku != skumatch){
+            //         productView();
+            //     }
+            // });
         }
                 
         /** DATALAYER: Cart View
