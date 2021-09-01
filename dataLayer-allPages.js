@@ -177,6 +177,12 @@ __DL__jQueryinterval = setInterval(function(){
                 $.cookie('logState', unescape);
                 $.removeCookie('logState', {path: '/'});
                 $.cookie('logState', 'firstLog', {path: '/'});
+
+                // ログアウト -> ログイン状態に遷移したタイミングで、ログインイベントを送る
+                var loginEvent = {
+                    "event": "login",
+                };
+                dataLayer.push(loginEvent);
             } else if ($.cookie('logState') === 'firstLog') {
                 $.cookie('logState', unescape);
                 $.removeCookie('logState', {path: '/'});
