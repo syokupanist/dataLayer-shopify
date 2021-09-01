@@ -164,9 +164,9 @@ __DL__jQueryinterval = setInterval(function(){
         * Log State Cookie */
         
         {% if customer %}
-        var isLoggedIn = true;
+            var isLoggedIn = true;
         {% else %}
-        var isLoggedIn = false;
+            var isLoggedIn = false;
         {% endif %}
         if (!isLoggedIn) {
             $.cookie('logState', unescape);
@@ -184,36 +184,14 @@ __DL__jQueryinterval = setInterval(function(){
             }
         }
         
-        if ($.cookie('logState') === 'firstLog') {
-            var firstLog = true;
-        } else {
-            var firstLog = false;
-        }
-        
         /**********************
         * DATALAYER SECTIONS 
         ***********************/
-        
-        /**
-        * DATALAYER: Landing Page
-        * Fires any time a user first lands on the site. */
-        
-        if ($.cookie('landingPage') === 'landed') {
-            dataLayer.push({
-                'pageType': 'Landing',
-                'event': 'Landing'
-            });
-            
-            if (__DL__.debug) {
-                console.log('DATALAYER: Landing Page fired.');
-            }
-        }
         
         /** 
         * DATALAYER: basic_dl_info
         * 1. Determine if user is logged in or not.
         * 2. Return User specific data. */
-        
         var basic_dl_info = {
             {% if shop.customer_accounts_enabled %}
                 {% if customer %}
@@ -232,47 +210,13 @@ __DL__jQueryinterval = setInterval(function(){
             'pageType'      : {{template | json}},
             'event'         : 'basic_dl_info'
         }
-        
         dataLayer.push(basic_dl_info);
         if(__DL__.debug){
             console.log("basic_dl_info"+" :"+JSON.stringify(basic_dl_info, null, " "));
         }
         
-        /** 
-        * DATALAYER: Homepage */
-        
-        if(document.location.pathname == "/"){
-            var homepage = {
-                'pageType' : 'Homepage',
-                'event'    : 'Homepage'
-            };
-            dataLayer.push(homepage);
-            if(__DL__.debug){
-                console.log("Homepage"+" :"+JSON.stringify(homepage, null, " "));
-            }
-        }
-        
-        /** 
-        * DATALAYER: Blog Articles
-        * Fire on Blog Article Pages */
-        
-        {% if template contains 'article' %}
-        var blog = {
-            'author'      : {{article.author | json}},
-            'title'       : {{article.title | json}},
-            'dateCreated' : {{article.created_at | json}},
-            'pageType'    : 'Blog',
-            'event'       : 'Blog'
-        };
-        dataLayer.push(blog);
-        if(__DL__.debug){
-            console.log("Blog"+" :"+JSON.stringify(blog, null, " "));
-        }
-        {% endif %}
-        
         /** DATALAYER: Product List Page (Collections, Category)
         * Fire on all product listing pages. */
-        
         {% if template contains 'collection' %}
             var product = {
                 'ecommerce': {
@@ -320,10 +264,7 @@ __DL__jQueryinterval = setInterval(function(){
             
         /** DATALAYER: Product Page
         * Fire on all Product View pages. */
-        
         if (template.match(/.*product.*/gi) && !template.match(/.*collection.*/gi)) {
-            
-            // sku = '';
             var product = {
                 'ecommerce': {
                     'currency'      : {{shop.currency | json}},
@@ -355,7 +296,6 @@ __DL__jQueryinterval = setInterval(function(){
             };
             
             function productView(){
-                // var sku = {{product.selected_variant.sku | json}};
                 dataLayer.push(product, {
                     'pageType' : 'Product',
                     'event'    : 'view_item'});
@@ -364,13 +304,6 @@ __DL__jQueryinterval = setInterval(function(){
                 }
             }
             productView();
-                
-            // $(__DL__.cartTriggers).click(function(){
-            //     var skumatch = {{product.selected_variant.sku | json}};
-            //     if(sku != skumatch){
-            //         productView();
-            //     }
-            // });
         }
                 
         /** DATALAYER: Cart View
