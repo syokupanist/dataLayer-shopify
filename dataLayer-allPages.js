@@ -202,7 +202,7 @@ __DL__jQueryinterval = setInterval(function(){
         
         /** DATALAYER: Product List Page (Collections, Category)
         * Fire on all product listing pages. */
-        {% if template contains 'collection' %}
+        {% if template contains 'collection' and template != 'list-collections' %}
             var product = {
                 'ecommerce': {
                     'items': [
