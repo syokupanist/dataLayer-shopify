@@ -247,6 +247,8 @@ __DL__jQueryinterval = setInterval(function(){
         * Fire on all Product View pages. */
         if (template.match(/.*product.*/gi) && !template.match(/.*collection.*/gi)) {
             var product = {
+                'event'    : 'view_item',
+                'pageType' : 'Product',
                 'ecommerce': {
                     'currency'      : {{shop.currency | json}},
                     'value'      : {{product.price | money_without_currency | remove: "," | json}}, // TODO: discountなどの考慮
@@ -277,9 +279,7 @@ __DL__jQueryinterval = setInterval(function(){
             };
             
             function productView(){
-                dataLayer.push(product, {
-                    'pageType' : 'Product',
-                    'event'    : 'view_item'});
+                dataLayer.push(product);
                 if(__DL__.debug){
                     console.log("view_item"+" :"+JSON.stringify(product, null, " "));
                 }
