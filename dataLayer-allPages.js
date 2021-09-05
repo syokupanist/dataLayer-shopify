@@ -311,22 +311,65 @@ __DL__jQueryinterval = setInterval(function(){
          * どの商品ページへのリンクをクリックしたかで、選択された商品を判定
          * 
         */
-        $("a").on("click", function(event) {
-            var target = event.currentTarget
-            if(!target.attributes || !target.attributes.href) return;
-            var link = decodeURIComponent(target.attributes.href.value);
-            console.log(link);
-            if (!link.startsWith('/products/')) return;
-            var matched = /\/products\/(.*)\?.*/.exec(link);
-            if (!matched[1]) return;
-            var select_item = {
-                "event": 'select_item',
-                "item_name": matched[1]
-            }
-            dataLayer.push(select_item);
-            if(__DL__.debug){
-                console.log("select_item"+" :"+JSON.stringify(select_item, null, " "));
-            }
+        $(function() {
+            $("a").on("click", function(event) {
+                var target = event.currentTarget
+                if(!target.attributes || !target.attributes.href) return;
+                var link = decodeURIComponent(target.attributes.href.value);
+                console.log(link);
+                if (!link.startsWith('/products/')) return;
+                var matched = /\/products\/([^\?]*).*/.exec(link);
+                if (!matched[1]) return;
+                var selected_item_name = matched[1];
+                var select_item = {
+                    "event": 'select_item',
+                    "item_name": selected_item_name
+                }
+                // コレクションページの場合、追加情報を送る
+                {% if template contains 'collection' and template != 'list-collections' %}
+                    select_item['item_list_name'] = {{collection.title | json}}
+
+                    // クリックされた商品情報詳細
+                    var products = {
+                        {% for product in collection.products %}
+                        {{product.handle | json}} : {
+                                'item_name'            : {{product.title | json}},
+                                'item_id'              : {{product.id | json}},
+                                'variant_id'       : {{product.selected_variant.id | json}},
+                                'sku'             : {{product.selected_variant.sku | json}},
+                                'price'           : {{product.price | money_without_currency | remove: "," | json}},
+                                'item_brand'           : {{shop.name | json}},              
+                                'item_type'     : {{product.type | json}},
+                                'item_category' : {{product.collections[0].title | json}},
+                                'item_category2' : {{product.collections[1].title | json}},
+                                'item_category3' : {{product.collections[2].title | json}},
+                                'item_category4' : {{product.collections[3].title | json}},
+                                'item_category5' : {{product.collections[4].title | json}},
+                                'item_options'  : {
+                                    {% for option in product.options_with_values %}
+                                    {% for value in option.values %}
+                                    {% if option.selected_value == value %}
+                                    {{option.name | json}} : {{value | json}},
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% endfor %}
+                                }
+                            },
+                        {% endfor %}
+                    }
+                    if (products[selected_item_name]) {
+                        select_item['ecommerce'] = {
+                            'items' : [
+                                products[selected_item_name]
+                            ]
+                        }
+                    }
+                {% endif %}
+                dataLayer.push(select_item);
+                if(__DL__.debug){
+                    console.log("select_item"+" :"+JSON.stringify(select_item, null, " "));
+                }
+            })
         })
                 
         /** DATALAYER: view_cart
