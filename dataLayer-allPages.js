@@ -187,16 +187,12 @@ __DL__jQueryinterval = setInterval(function(){
                     'user_id'        : {{customer.id | json}},
                     'user_type'      : "Member",
                 {% else %}
+                    'user_id' : null,
                     'user_type' : "Guest",
                 {% endif %}
             {% endif %}
-            {% if customer.orders_count > 2 %}
-                'customerType'       : 'Returning',
-            {% else %}
-                'customerType'       : 'New',
-            {% endif %}
             'currency'      : {{shop.currency | json}},
-            'pageType'      : {{template | json}},
+            'page_type'      : {{template | json}},
             'event'         : 'basic_dl_info'
         }
         dataLayer.push(basic_dl_info);
