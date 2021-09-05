@@ -374,7 +374,7 @@ __DL__jQueryinterval = setInterval(function(){
         {% if template contains 'cart' %}
             var cart = {
                 'event'    : 'view_cart',
-                'currency'      : {{cart.currency | json}},
+                'currency'      : {{cart.currency.iso_code | json}},
                 'value'      : {{cart.total_price | money_without_currency | remove: "," | json}},
                 'pageType' : 'Cart',
                 'ecommerce': {
@@ -385,7 +385,7 @@ __DL__jQueryinterval = setInterval(function(){
                             'item_id'              : {{line_item.product.id | json}},
                             'variant_id'       : {{line_item.product.selected_variant.id | json}},
                             'sku'             : {{line_item.product.selected_variant.sku | json}},
-                            'price'           : {{line_item.product.price | money_without_currency | remove: "," | json}},
+                            'price'           : {{line_item.final_price | money_without_currency | remove: "," | json}},
                             'item_brand'           : {{shop.name | json}},              
                             'item_type'     : {{line_item.product.type | json}},
                             'item_category' : {{line_item.product.collections[0].title | json}},
@@ -401,10 +401,10 @@ __DL__jQueryinterval = setInterval(function(){
                                 {% endif %}
                                 {% endfor %}
                                 {% endfor %}
-                            }
+                            },
+                            'quantity': {{line_item.quantity | json}}
                         },
                     {% endfor %}],
-                    // TODO: add quantity
                 }
             };
         
