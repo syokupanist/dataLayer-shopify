@@ -203,7 +203,10 @@ __DL__jQueryinterval = setInterval(function(){
         /** DATALAYER: Product List Page (Collections, Category)
         * Fire on all product listing pages. */
         {% if template contains 'collection' and template != 'list-collections' %}
-            var product = {
+            var collections = {
+                'event'       : 'view_item_list',
+                'item_list_name' : {{collection.title | json}},
+                'pageType'    : 'Collection',
                 'ecommerce': {
                     'items': [
                         {% for product in collection.products %}
@@ -234,15 +237,8 @@ __DL__jQueryinterval = setInterval(function(){
                     ]
                 }
             };
-            var collections = {
-                'event'       : 'view_item_list',
-                'item_list_name' : {{collection.title | json}},
-                'pageType'    : 'Collection',
-            };
-            dataLayer.push(product);
             dataLayer.push(collections);
             if(__DL__.debug){
-                console.log("view_item_list"+" :"+JSON.stringify(product, null, " "));
                 console.log("view_item_list"+" :"+JSON.stringify(collections, null, " "));
             }
         {% endif %}
