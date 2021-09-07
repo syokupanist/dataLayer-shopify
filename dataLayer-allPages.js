@@ -583,6 +583,8 @@ __DL__jQueryinterval = setInterval(function(){
                                 collection_matchIDs.push(x);
                             }
                             var x = __DL__arr_diff(collection_cartIDs, collection_matchIDs).pop();
+                            collection_cartIDs = collection_matchIDs;
+                            collection_matchIDs = [];
                             console.log(x);
                             for (var i = __DL__.cart.length - 1; i >= 0; i--) {
                                 if (__DL__.cart[i].variant_id.toString() === x) {
