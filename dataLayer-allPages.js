@@ -535,8 +535,7 @@ __DL__jQueryinterval = setInterval(function(){
             });
             
             function __DL__addtocart(){
-
-                {% if template contains 'collection' %}         
+                // FIXME: すぐページ遷移する場合、イベントを送れない。
                     setTimeout(function(){
                         jQuery.getJSON('/cart.js', function (response) {
                             // get Json response 
@@ -568,22 +567,6 @@ __DL__jQueryinterval = setInterval(function(){
                             }
                         });
                     },1000);
-                {% else %}
-                    var e = {
-                        'event'    : 'add_to_cart',
-                        'ecommerce': {
-                            'items': [
-                                product
-                            ]
-                        }
-                    };
-                    dataLayer.push(e);
-                
-                    if (__DL__.debug) {
-                        console.log("add_to_cart"+" :"+JSON.stringify(e, null, " "));
-                    }
-                {% endif %}
-                
             }
             
             $(document).on('click', __DL__.cartTriggers, function() {
