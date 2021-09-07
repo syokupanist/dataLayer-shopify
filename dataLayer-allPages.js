@@ -440,7 +440,7 @@ __DL__jQueryinterval = setInterval(function(){
             }
         
             __DL__.cart = cart.ecommerce.items;
-            $(__DL__.removeCartTrigger).on('click', function (event) {
+            $(document).on('click', __DL__.removeCartTrigger, function (event) {
                 setTimeout(function(){
                     // remove from cart
                     jQuery.getJSON("/cart", function (response) {
@@ -463,7 +463,6 @@ __DL__jQueryinterval = setInterval(function(){
                         for(var i=__DL__.cart.length-1;i>=0;i--){
                             if(__DL__.cart[i].variant_id==x){removeCart.push(__DL__.cart[i])}
                         }
-
                         var e = {
                             'event'    : 'remove_from_cart',
                             'ecommerce' : {
@@ -474,6 +473,8 @@ __DL__jQueryinterval = setInterval(function(){
                         if (__DL__.debug) {
                             console.log("remove_from_cart"+" :"+JSON.stringify(e, null, " "));
                         }
+
+                        __DL__.cart = __DL__.removeCart
                     });
                 }, 2000);
             });
