@@ -335,7 +335,7 @@ __DL__jQueryinterval = setInterval(function(){
          * 
         */
         $(function() {
-            $("a").on("click", function(event) {
+            $(document).on("click", "a", function(event) {
                 var target = event.currentTarget
                 if(!target.attributes || !target.attributes.href) return;
                 var link = decodeURIComponent(target.attributes.href.value);
