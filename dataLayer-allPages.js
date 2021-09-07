@@ -236,7 +236,6 @@ __DL__jQueryinterval = setInterval(function(){
             var collections = {
                 'event'       : 'view_item_list',
                 'item_list_name' : {{collection.title | json}},
-                'pageType'    : 'Collection',
                 'ecommerce': {
                     'items': [
                         {% for product in collection.products %}
@@ -278,7 +277,6 @@ __DL__jQueryinterval = setInterval(function(){
         if (template.match(/.*product.*/gi) && !template.match(/.*collection.*/gi)) {
             var product = {
                 'event'    : 'view_item',
-                'pageType' : 'Product',
                 'ecommerce': {
                     'currency'      : {{shop.currency | json}},
                     'value'      : {{product.price | money_without_currency | remove: "," | json}}, // TODO: discountなどの考慮
@@ -322,7 +320,6 @@ __DL__jQueryinterval = setInterval(function(){
         if(document.location.pathname.match(searchPage)){
             var search = {
                 'search_term' : {{search.terms | json}},
-                'pageType'   : "Search",
                 'event'      : "search"
             };
             
@@ -406,7 +403,6 @@ __DL__jQueryinterval = setInterval(function(){
                 'event'    : 'view_cart',
                 'currency'      : {{cart.currency.iso_code | json}},
                 'value'      : {{cart.total_price | money_without_currency | remove: "," | json}},
-                'pageType' : 'Cart',
                 'ecommerce': {
                     'items':[
                     {% for line_item in cart.items %}
@@ -470,7 +466,6 @@ __DL__jQueryinterval = setInterval(function(){
 
                         var e = {
                             'event'    : 'remove_from_cart',
-                            'pageType' : 'Remove from Cart',
                             'ecommerce' : {
                                 'items': removeCart,
                             }
@@ -512,7 +507,6 @@ __DL__jQueryinterval = setInterval(function(){
                     __DL__.cart = response.items.map(__DL__cartResponseFormatter)
                     var cart = {
                         'event'    : 'add_to_cart',
-                        'pageType' : 'Cart',
                         'ecommerce': {
                             'items': __DL__.cart,
                         },
@@ -548,7 +542,6 @@ __DL__jQueryinterval = setInterval(function(){
                                     __DL__.removeCart = response.items.map(__DL__cartResponseFormatter)
                                         var removeFromCart = {
                                             'event'    : 'remove_from_cart',
-                                            'pageType' : 'Remove from Cart',
                                             'ecommerce': {
                                                 'items': __DL__.removeCart,
                                             },
@@ -595,7 +588,6 @@ __DL__jQueryinterval = setInterval(function(){
                                     product = __DL__.cart[i];
                                     var e = {
                                         'event'    : 'add_to_cart',
-                                        'pageType' : 'Add to Cart',
                                         'ecommerce': {
                                             'items': [
                                                 product
@@ -613,7 +605,6 @@ __DL__jQueryinterval = setInterval(function(){
                 {% else %}
                     var e = {
                         'event'    : 'add_to_cart',
-                        'pageType' : 'Add to Cart',
                         'ecommerce': {
                             'items': [
                                 product
@@ -644,7 +635,6 @@ __DL__jQueryinterval = setInterval(function(){
                                     __DL__.removeCart = response.items.map(__DL__cartResponseFormatter)
                                     var removeFromCart = {
                                         'event'    : 'remove_from_cart',
-                                        'pageType' : 'Remove from Cart',
                                         'ecommerce': {
                                             'items': __DL__.removeCart,
                                         },
