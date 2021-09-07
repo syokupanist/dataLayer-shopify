@@ -32,48 +32,53 @@
 
     /** DATALAYER: Checkout */
     if(Shopify.Checkout){
-        __DL__products = [];
-        {% for line_item in checkout.line_items %}
-            __DL__products.push({
-                'id'          : {{line_item.product_id | json}},
-                'sku'         : {{line_item.sku | json}},
-                'variantId'   : {{line_item.variant_id | json}},
-                'name'        : {{line_item.title | json}},
-                'productType' : {{line_item.product.type | json}},
-                'price'       : {{line_item.price | money_without_currency | remove: "," | json}},
-                'quantity'    : {{line_item.quantity | json}},
-                'description' : {{line_item.product.description | strip_newlines | strip_html  | json }},
-                'imageURL'    : "https:{{line_item.product.featured_image.src|img_url:'grande'}}", 
-                'productURL'  : '{{shop.secure_url}}{{line_item.product.url}}'
-            });
-        {% endfor %}
-
-        transactionData = {
-            'transactionNumber'      : {{checkout.order_id | json}},
-            'transactionId'          : {{checkout.order_number | json}},
-            'transactionAffiliation' : {{shop.name | json}},
-            'transactionTotal'       : {{checkout.total_price | money_without_currency| remove: "," | json}},
-            'transactionTax'         : {{checkout.tax_price | money_without_currency| remove: "," | json}},
-            'transactionShipping'    : {{checkout.shipping_price | money_without_currency| remove: "," | json}},
-            'transactionSubtotal'    : {{checkout.subtotal_price | money_without_currency| remove: "," | json}},
+        var transactionData = {
+            'event'    :'purchase',
+            'currency'          : {{checkout.currency | json}},
+            'transaction_id'          : {{checkout.order_number | json}},
+            'value'       : {{checkout.total_price | money_without_currency| remove: "," | json}},
+            'affiliation' : {{shop.name | json}},
             {% for discount in checkout.discounts %}
-            'promoCode' : {{discount.code | json}},
+            'coupon' : {{discount.code | json}},
             'discount'  : {{discount.amount | money_without_currency | json}},
             {% endfor %}
-            
-            'products': __DL__products
+            'shipping'    : {{checkout.shipping_price | money_without_currency| remove: "," | json}},
+            'tax'         : {{checkout.tax_price | money_without_currency| remove: "," | json}},
+            'ecommerce': {
+                'items':[
+                {% for line_item in checkout.line_items %}
+                    {
+                        'item_name'            : {{line_item.product.title | json}},
+                        'item_id'              : {{line_item.product.id | json}},
+                        'variant_id'       : {{line_item.variant_id | json}},
+                        'sku'             : {{line_item.sku | json}},
+                        'price'           : {{line_item.final_price | money_without_currency | remove: "," | json}},
+                        'item_brand'           : {{shop.name | json}},              
+                        'item_type'     : {{line_item.product.type | json}},
+                        'item_category' : {{line_item.product.collections[0].title | json}},
+                        'item_category2' : {{line_item.product.collections[1].title | json}},
+                        'item_category3' : {{line_item.product.collections[2].title | json}},
+                        'item_category4' : {{line_item.product.collections[3].title | json}},
+                        'item_category5' : {{line_item.product.collections[4].title | json}},
+                        'item_options'  : {
+                            {% for option in line_item.product.options_with_values %}
+                            {% for value in option.values %}
+                            {% if option.selected_value == value %}
+                            {{option.name | json}} : {{value | json}},
+                            {% endif %}
+                            {% endfor %}
+                            {% endfor %}
+                        },
+                        'quantity': {{line_item.quantity | json}}
+                    },
+                {% endfor %}],
+            }
         };
-    
-        if(Shopify.Checkout.step){ 
-            /** DATALAYER: Transaction */
-            if(Shopify.Checkout.page == "thank_you"){
-                dataLayer.push(transactionData,{
-                    'pageType' :'Transaction',
-                    'event'    :'Transaction'
-                });       
-                if(__DL__.debug == true){
-                    console.log("Transaction Data"+" :"+JSON.stringify(transactionData, null, " "));  
-                }
+
+        if(Shopify.Checkout.step && Shopify.Checkout.page == "thank_you"){ 
+            dataLayer.push(transactionData);       
+            if(__DL__.debug == true){
+                console.log("purchase"+" :"+JSON.stringify(transactionData, null, " "));  
             }
         }
     }
