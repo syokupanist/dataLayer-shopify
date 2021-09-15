@@ -7,6 +7,11 @@
     window.dataLayer = window.dataLayer || [];  // init data layer if doesn't already exist
     dataLayer.push({'event': 'Begin DataLayer'}); // begin datalayer
 
+    var page_type = {{template | json}};
+    if (document.location.pathname.includes("thank_you")) {
+        page_type = 'transaction_complete';
+    }
+
     /** 
     * DATALAYER: basic_dl_info
     * 1. Determine if user is logged in or not.
@@ -22,7 +27,7 @@
             {% endif %}
         {% endif %}
         'currency'      : {{shop.currency | json}},
-        'page_type'      : {{template | json}},
+        'page_type'      : page_type,
         'event'         : 'basic_dl_info'
     }
     dataLayer.push(basic_dl_info);
