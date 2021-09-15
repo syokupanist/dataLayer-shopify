@@ -498,7 +498,17 @@ __DL__jQueryinterval = setInterval(function(){
         * Fire all pages trigger after all additional dataLayers have loaded. */
         
         $(document).ready(function() {
-            
+            /** DATALAYER: begin_checkout */
+            $('input[name="checkout"]').on('click', function() { 
+                var e = {
+                    'event'    : 'begin_checkout',
+                }
+                dataLayer.push(e);
+                if (__DL__.debug) {
+                    console.log("begin_checkout"+" :"+JSON.stringify(e, null, " "));
+                }
+            });
+
             /** DATALAYER: Cart */
             
             // stage cart data
