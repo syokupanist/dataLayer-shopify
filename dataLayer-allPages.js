@@ -511,27 +511,6 @@ __DL__jQueryinterval = setInterval(function(){
 
             /** DATALAYER: Cart */
             
-            // stage cart data
-            function mapJSONcartData(){
-                jQuery.getJSON('/cart.js', function (response) {
-                    // get Json response 
-                    __DL__.cart = response.items.map(__DL__cartResponseFormatter)
-                    var cart = {
-                        'event'    : 'add_to_cart',
-                        'ecommerce': {
-                            'items': __DL__.cart,
-                        },
-                    };
-                    if(cart.ecommerce.items.length > 0){
-                        dataLayer.push(cart);
-                        if (__DL__.debug) {
-                            console.log("add_to_cart"+" :"+JSON.stringify(cart, null, " "));
-                        }
-                    }
-                });
-            }
-            
-            
             // add to cart
             jQuery.getJSON('/cart.js', function (response) {
                 // get Json response 
@@ -544,43 +523,15 @@ __DL__jQueryinterval = setInterval(function(){
                 }
             });
             
-            function __DL__addtocart(){
-                // FIXME: すぐページ遷移する場合、イベントを送れない。
-                    setTimeout(function(){
-                        jQuery.getJSON('/cart.js', function (response) {
-                            // get Json response 
-                            __DL__.cart = response.items.map(__DL__cartResponseFormatter)
-                            for (var i = __DL__.cart.length - 1; i >= 0; i--) {
-                                var x = parseFloat(__DL__.cart[i].variant_id);
-                                collection_matchIDs.push(x);
-                            }
-                            var x = __DL__arr_diff(collection_cartIDs, collection_matchIDs).pop();
-                            collection_cartIDs = collection_matchIDs;
-                            collection_matchIDs = [];
-                            console.log(x);
-                            for (var i = __DL__.cart.length - 1; i >= 0; i--) {
-                                if (__DL__.cart[i].variant_id.toString() === x) {
-                                    product = __DL__.cart[i];
-                                    var e = {
-                                        'event'    : 'add_to_cart',
-                                        'ecommerce': {
-                                            'items': [
-                                                product
-                                            ]
-                                        }
-                                    }
-                                    dataLayer.push(e);
-                                    if (__DL__.debug) {
-                                        console.log("add_to_cart"+" :"+JSON.stringify(e, null, " "));
-                                    }
-                                }
-                            }
-                        });
-                    },1000);
-            }
-            
-            $(document).on('click', __DL__.cartTriggers, function() {
-                __DL__addtocart();
+            $(document).on('click', __DL__.cartTriggers, function(event) {
+                // ページ遷移する場合イベント送信が完了しない可能性あり
+                var e = {
+                    'event'    : 'add_to_cart',
+                }
+                dataLayer.push(e);
+                if (__DL__.debug) {
+                    console.log("add_to_cart"+" :"+JSON.stringify(e, null, " "));
+                }
             });
                 
         }); // document ready
