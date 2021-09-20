@@ -344,9 +344,16 @@ __DL__jQueryinterval = setInterval(function(){
                 var matched = /\/products\/([^\?]*).*/.exec(link);
                 if (!matched[1]) return;
                 var selected_item_name = matched[1];
+                dataLayer.push({"ecommerce": null})
                 var select_item = {
                     "event": 'select_item',
-                    "item_name": selected_item_name
+                    "ecommerce": {
+                        "items": [
+                            {
+                                "item_name": selected_item_name
+                            }
+                        ]
+                    }
                 }
                 // コレクションページの場合、追加情報を送る
                 {% if template contains 'collection' and template != 'list-collections' %}
@@ -469,6 +476,7 @@ __DL__jQueryinterval = setInterval(function(){
                                 'items': removeCart,
                             }
                         }
+                        dataLayer.push({"ecommerce": null})
                         dataLayer.push(e);
                         if (__DL__.debug) {
                             console.log("remove_from_cart"+" :"+JSON.stringify(e, null, " "));
@@ -503,6 +511,7 @@ __DL__jQueryinterval = setInterval(function(){
                 var e = {
                     'event'    : 'begin_checkout',
                 }
+                dataLayer.push({"ecommerce": null})
                 dataLayer.push(e);
                 if (__DL__.debug) {
                     console.log("begin_checkout"+" :"+JSON.stringify(e, null, " "));
@@ -528,6 +537,7 @@ __DL__jQueryinterval = setInterval(function(){
                 var e = {
                     'event'    : 'add_to_cart',
                 }
+                dataLayer.push({"ecommerce": null})
                 dataLayer.push(e);
                 if (__DL__.debug) {
                     console.log("add_to_cart"+" :"+JSON.stringify(e, null, " "));
