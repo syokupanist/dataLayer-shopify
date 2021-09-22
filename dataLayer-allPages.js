@@ -56,6 +56,13 @@ function __DL__arr_diff(b,c){
     for(var k in a){diff.push(k)}
     return diff
 };
+
+function sha256(str) {
+    var buff = new Uint8Array([].map.call(str, (c) => c.charCodeAt(0))).buffer;
+    return crypto.subtle.digest('SHA-256', buff).then(digest => {
+      return [].map.call(new Uint8Array(digest), x => ('00' + x.toString(16)).slice(-2)).join('') 
+    })
+}
                                 
 
 __DL__jQueryinterval = setInterval(function(){
@@ -212,23 +219,37 @@ __DL__jQueryinterval = setInterval(function(){
         * 1. Determine if user is logged in or not.
         * 2. Return User specific data. */
         var basic_dl_info = {
-            {% if shop.customer_accounts_enabled %}
-                {% if customer %}
-                    'user_id'        : {{customer.id | json}},
-                    'user_type'      : "Member",
-                {% else %}
-                    'user_id' : null,
-                    'user_type' : "Guest",
-                {% endif %}
-            {% endif %}
             'currency'      : {{shop.currency | json}},
             'page_type'      : {{template | json}},
             'event'         : 'basic_dl_info'
         }
-        dataLayer.push(basic_dl_info);
-        if(__DL__.debug){
-            console.log("basic_dl_info"+" :"+JSON.stringify(basic_dl_info, null, " "));
-        }
+        
+        {% if shop.customer_accounts_enabled %}
+            {% if customer %}
+                basic_dl_info['user_id']  = {{customer.id | json}}
+                basic_dl_info['user_type'] = "Member"
+                var email = {{customer.email | json}}
+                sha256(email).then(h => { 
+                    basic_dl_info['hashed_em'] = h 
+                    dataLayer.push(basic_dl_info);
+                    if(__DL__.debug){
+                        console.log("basic_dl_info"+" :"+JSON.stringify(basic_dl_info, null, " "));
+                    }
+                })
+            {% else %}
+                basic_dl_info['user_id'] = null
+                basic_dl_info['user_type'] = "Guest"
+                dataLayer.push(basic_dl_info);
+                if(__DL__.debug){
+                    console.log("basic_dl_info"+" :"+JSON.stringify(basic_dl_info, null, " "));
+                }
+            {% endif %}
+        {% else %}      
+            dataLayer.push(basic_dl_info);
+            if(__DL__.debug){
+                console.log("basic_dl_info"+" :"+JSON.stringify(basic_dl_info, null, " "));
+            }
+        {% endif %}
         
         /** DATALAYER: Product List Page (Collections, Category)
         * Fire on all product listing pages. */
