@@ -39,17 +39,17 @@
     if(Shopify.Checkout){
         var transactionData = {
             'event'    :'purchase',
-            'currency'          : {{checkout.currency | json}},
-            'transaction_id'          : {{checkout.order_number | json}},
-            'value'       : {{checkout.total_price | money_without_currency| remove: "," | json}},
-            'affiliation' : {{shop.name | json}},
-            {% for discount in checkout.discounts %}
-            'coupon' : {{discount.code | json}},
-            'discount'  : {{discount.amount | money_without_currency | json}},
-            {% endfor %}
-            'shipping'    : {{checkout.shipping_price | money_without_currency| remove: "," | json}},
-            'tax'         : {{checkout.tax_price | money_without_currency| remove: "," | json}},
             'ecommerce': {
+                'currency'          : {{checkout.currency | json}},
+                'transaction_id'          : {{checkout.order_number | json}},
+                'value'       : {{checkout.total_price | money_without_currency| remove: "," | json}},
+                'affiliation' : {{shop.name | json}},
+                {% for discount in checkout.discounts %}
+                'coupon' : {{discount.code | json}},
+                'discount'  : {{discount.amount | money_without_currency | json}},
+                {% endfor %}
+                'shipping'    : {{checkout.shipping_price | money_without_currency| remove: "," | json}},
+                'tax'         : {{checkout.tax_price | money_without_currency| remove: "," | json}},
                 'items':[
                 {% for line_item in checkout.line_items %}
                     {
