@@ -64,6 +64,11 @@ function sha256(str) {
     })
 }
                                 
+var __DL__hashed_em = '';
+sha256({{customer.email | json}}).then(h => { 
+    // __DL__jQueryintervalの関数が実行されるまでに__DL__hashed_emに値が入ることを期待
+    __DL__hashed_em = h ;
+})
 
 __DL__jQueryinterval = setInterval(function(){
     // wait for jQuery to load & run script after jQuery has loaded
@@ -216,8 +221,7 @@ __DL__jQueryinterval = setInterval(function(){
         
         /** 
         * DATALAYER: basic_dl_info
-        * 1. Determine if user is logged in or not.
-        * 2. Return User specific data. */
+        **/
         var basic_dl_info = {
             'currency'      : {{shop.currency | json}},
             'page_type'      : {{template | json}},
@@ -228,28 +232,16 @@ __DL__jQueryinterval = setInterval(function(){
             {% if customer %}
                 basic_dl_info['user_id']  = {{customer.id | json}}
                 basic_dl_info['user_type'] = "Member"
-                var email = {{customer.email | json}}
-                sha256(email).then(h => { 
-                    basic_dl_info['hashed_em'] = h 
-                    dataLayer.push(basic_dl_info);
-                    if(__DL__.debug){
-                        console.log("basic_dl_info"+" :"+JSON.stringify(basic_dl_info, null, " "));
-                    }
-                })
+                basic_dl_info['hashed_em'] = __DL__hashed_em
             {% else %}
                 basic_dl_info['user_id'] = null
                 basic_dl_info['user_type'] = "Guest"
-                dataLayer.push(basic_dl_info);
-                if(__DL__.debug){
-                    console.log("basic_dl_info"+" :"+JSON.stringify(basic_dl_info, null, " "));
-                }
             {% endif %}
-        {% else %}      
-            dataLayer.push(basic_dl_info);
-            if(__DL__.debug){
-                console.log("basic_dl_info"+" :"+JSON.stringify(basic_dl_info, null, " "));
-            }
         {% endif %}
+        dataLayer.push(basic_dl_info);
+        if(__DL__.debug){
+            console.log("basic_dl_info"+" :"+JSON.stringify(basic_dl_info, null, " "));
+        }
         
         /** DATALAYER: Product List Page (Collections, Category)
         * Fire on all product listing pages. */

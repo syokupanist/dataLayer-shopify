@@ -1,5 +1,12 @@
 <script>
-(function () {
+function sha256(str) {
+    var buff = new Uint8Array([].map.call(str, (c) => c.charCodeAt(0))).buffer;
+    return crypto.subtle.digest('SHA-256', buff).then(digest => {
+      return [].map.call(new Uint8Array(digest), x => ('00' + x.toString(16)).slice(-2)).join('') 
+    })
+}
+
+function pafit_dl() {
     __DL__ = {
         debug: true, // if true, console messages will be displayed
     };
@@ -13,23 +20,23 @@
     }
 
     /** 
-    * DATALAYER: basic_dl_info
-    * 1. Determine if user is logged in or not.
-    * 2. Return User specific data. */
+    * DATALAYER: basic_dl_info */
     var basic_dl_info = {
-        {% if shop.customer_accounts_enabled %}
-            {% if customer %}
-                'user_id'        : {{customer.id | json}},
-                'user_type'      : "Member",
-            {% else %}
-                'user_id' : null,
-                'user_type' : "Guest",
-            {% endif %}
-        {% endif %}
         'currency'      : {{shop.currency | json}},
-        'page_type'      : page_type,
+        'page_type'      : {{template | json}},
         'event'         : 'basic_dl_info'
     }
+    
+    {% if shop.customer_accounts_enabled %}
+        {% if customer %}
+            basic_dl_info['user_id']  = {{customer.id | json}}
+            basic_dl_info['user_type'] = "Member"
+            basic_dl_info['hashed_em'] = __DL__hashed_em
+        {% else %}
+            basic_dl_info['user_id'] = null
+            basic_dl_info['user_type'] = "Guest"
+        {% endif %}
+    {% endif %}
     dataLayer.push(basic_dl_info);
     if(__DL__.debug){
         console.log("basic_dl_info"+" :"+JSON.stringify(basic_dl_info, null, " "));
@@ -87,7 +94,13 @@
             }
         }
     }
-})();
+}
+
+var __DL__hashed_em = '';
+sha256({{customer.email | json}}).then(h => { 
+    __DL__hashed_em = h ;
+    pafit_dl();
+})
 
 // Google Tag Manager 
 (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
