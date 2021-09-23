@@ -421,9 +421,9 @@ __DL__jQueryinterval = setInterval(function(){
         {% if template contains 'cart' %}
             var cart = {
                 'event'    : 'view_cart',
-                'currency'      : {{cart.currency.iso_code | json}},
-                'value'      : {{cart.total_price | money_without_currency | remove: "," | json}},
                 'ecommerce': {
+                    'currency'      : {{cart.currency.iso_code | json}},
+                    'value'      : {{cart.total_price | money_without_currency | remove: "," | json}},
                     'items':[
                     {% for line_item in cart.items %}
                         {
