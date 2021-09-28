@@ -97,10 +97,13 @@ function pafit_dl() {
 }
 
 var __DL__hashed_em = '';
-sha256({{customer.email | json}}).then(h => { 
-    __DL__hashed_em = h ;
-    pafit_dl();
-})
+var _em = {{customer.email | json}}
+if (_em) {
+    sha256(_em).then(h => { 
+        __DL__hashed_em = h ;
+    })
+}
+pafit_dl();
 
 // Google Tag Manager 
 (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
